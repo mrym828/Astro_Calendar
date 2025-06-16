@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 import uuid
 from timezone_field import TimeZoneField
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 class NewsletterSubscriber(models.Model):
     email = models.EmailField(unique=True)
@@ -17,6 +19,12 @@ class Location(models.Model):
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
     timezone = TimeZoneField()
     country_code = models.CharField(max_length=3)
+    elevation_meters = models.IntegerField(default=0, help_text="Elevation above sea level in meters")
+    light_pollution_level = models.IntegerField(
+        default=5,
+        validators=[MinValueValidator(1), MaxValueValidator(9)],
+        help_text="Bortle scale: 1=excellent dark sky, 9=inner city sky"
+    )
     
     last_api_update = models.DateTimeField(null=True, blank=True)
     api_cache_valid_until = models.DateTimeField(null=True, blank=True)
@@ -47,7 +55,6 @@ class CelestialEvent(models.Model):
         ('eclipse', 'Eclipse'),
         ('meteor_shower', 'Meteor Shower'),
         ('planetary_event', 'Planetary Event'),
-        ('iss_pass', 'ISS Pass'),
         ('sunrise_sunset', 'Sunrise/Sunset'),
         ('astronomical_twilight', 'Astronomical Twilight'),
         ('conjunction', 'Conjunction'),
@@ -62,19 +69,29 @@ class CelestialEvent(models.Model):
     description = models.TextField()
     
     api_source = models.ForeignKey(APIDataSource, on_delete=models.CASCADE)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
     external_id = models.CharField(max_length=200, help_text="ID from external API")
     raw_api_data = models.JSONField(default=dict, help_text="Original API response")
     last_updated_from_api = models.DateTimeField(auto_now=True)
-    
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
-    
     magnitude = models.FloatField(null=True, blank=True)
-    visibility_info = models.JSONField(default=dict)
     coordinates = models.JSONField(default=dict, help_text="Sky coordinates from API")
-    
     is_featured = models.BooleanField(default=False)
     importance_level = models.IntegerField(default=2, choices=[(1, 'Minor'), (2, 'Significant'), (3, 'Major'), (4, 'Critical')])
-    
+    duration_minutes = models.IntegerField(null=True, blank=True)
+    viewing_difficulty = models.CharField(
+        max_length=20,
+        choices=[
+            ('easy', 'Easy - Naked Eye'),
+            ('moderate', 'Moderate - Binoculars'),
+            ('difficult', 'Difficult - Telescope Required'),
+            ('expert', 'Expert - Advanced Equipment'),
+        ],
+        default='easy'
+    )
+
+    slug = models.SlugField(max_length=250, blank=True)
+    meta_description = models.CharField(max_length=160, blank=True)
+
     class Meta:
         db_table = 'celestial_events'
         unique_together = ['external_id', 'api_source', 'date_time']
@@ -82,11 +99,27 @@ class CelestialEvent(models.Model):
             models.Index(fields=['date_time', 'event_type']),
             models.Index(fields=['location', 'date_time']),
             models.Index(fields=['api_source', 'last_updated_from_api']),
+            models.Index(fields=['importance_level', 'date_time']),
+            models.Index(fields=['is_featured']),
         ]
+        ordering = ['date_time']
     
     @property
     def is_upcoming(self):
         return self.date_time > timezone.now()
+    
+    @property
+    def is_happening_now(self):
+        now = timezone.now()
+        if self.end_time:
+            return self.date_time <= now <= self.end_time
+        return abs((self.date_time - now).total_seconds()) < 3600
+    
+    @property
+    def time_until_event(self):
+        if self.is_upcoming:
+            return self.date_time - timezone.now()
+        return None
     
     @property
     def needs_api_refresh(self):
@@ -94,6 +127,13 @@ class CelestialEvent(models.Model):
         if not self.last_updated_from_api:
             return True
         return (timezone.now() - self.last_updated_from_api).days > 1
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            base_slug = slugify(f"{self.name}-{self.date_time.strftime('%Y-%m-%d')}")
+            self.slug = base_slug
+        super().save(*args, **kwargs)
 
 
 class MoonPhase(CelestialEvent):
@@ -109,7 +149,9 @@ class MoonPhase(CelestialEvent):
     ]
     
     phase = models.CharField(max_length=20, choices=PHASE_CHOICES)
-    illumination_percentage = models.FloatField()
+    illumination_percentage = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(100.0)]
+    )
     angular_diameter = models.FloatField(null=True, blank=True)
     distance_km = models.FloatField(null=True, blank=True)
     moon_age_days = models.FloatField(null=True, blank=True, help_text="Days since new moon")
@@ -132,23 +174,15 @@ class Eclipse(CelestialEvent):
     ]
     
     eclipse_type = models.CharField(max_length=20, choices=ECLIPSE_TYPES)
-    obscuration_percentage = models.FloatField()
+    obscuration_percentage = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(100.0)]
+    )
     path_coordinates = models.JSONField(default=list, help_text="Path coordinates from API")
     visibility_regions = models.JSONField(default=list, help_text="Where eclipse is visible")
     duration_seconds = models.IntegerField(null=True, blank=True)
     
     class Meta:
         db_table = 'eclipse_events'
-
-class ISSPass(CelestialEvent):
-    max_elevation = models.FloatField()
-    direction_start = models.CharField(max_length=10) 
-    direction_end = models.CharField(max_length=10)
-    brightness = models.FloatField(help_text="Visual magnitude")
-    duration_seconds = models.IntegerField()
-    
-    class Meta:
-        db_table = 'iss_pass_events'
 
 class PlanetaryEvent(CelestialEvent):
     planet_name = models.CharField(max_length=50)
@@ -157,6 +191,9 @@ class PlanetaryEvent(CelestialEvent):
     angular_diameter = models.FloatField(null=True, blank=True)
     distance_au = models.FloatField(null=True, blank=True)
     phase_percentage = models.FloatField(null=True, blank=True)  
+    right_ascension = models.FloatField(null=True, blank=True)
+    declination = models.FloatField(null=True, blank=True)
+    elongation = models.FloatField(null=True, blank=True)
     
     class Meta:
         db_table = 'planetary_events'

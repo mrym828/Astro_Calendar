@@ -35,11 +35,6 @@ class EclipseAdmin(admin.ModelAdmin):
     list_display = ('name', 'eclipse_type', 'obscuration_percentage', 'date_time')
     list_filter = ('eclipse_type',)
 
-@admin.register(ISSPass)
-class ISSPassAdmin(admin.ModelAdmin):
-    list_display = ('name', 'max_elevation', 'brightness', 'date_time')
-    list_filter = ('max_elevation',)
-
 @admin.register(PlanetaryEvent)
 class PlanetaryEventAdmin(admin.ModelAdmin):
     list_display = ('name', 'planet_name', 'constellation', 'apparent_magnitude', 'date_time')

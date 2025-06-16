@@ -23,6 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-429om3=t$%(84kh2eygc4x3$6h76%iey=1!kt8(^%6bl5&2090'
 
+# API keys
 MOON_API_KEY = config('MOON_API_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -88,11 +89,11 @@ WSGI_APPLICATION = 'astrocalendar_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'astro_db',          
-        'USER': 'astro_user',        
+        'NAME': config('DB_NAME'),          
+        'USER': config('DB_User'),        
         'PASSWORD': config('DatabasePass'),
-        'HOST': 'localhost',
-        'PORT': '5432',              
+        'HOST': config('DB_Host'),
+        'PORT': config('DB_Port'),              
     }
 }
 
@@ -127,6 +128,13 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -138,3 +146,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#pagination
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 6, 
+}
