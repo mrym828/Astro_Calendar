@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 from decouple import config
 
@@ -25,6 +26,9 @@ SECRET_KEY = 'django-insecure-429om3=t$%(84kh2eygc4x3$6h76%iey=1!kt8(^%6bl5&2090
 
 # API keys
 MOON_API_KEY = config('MOON_API_KEY')
+
+#API URLS
+SUNRISE_SUNSET_URL = config('SunRise_SunSet_URL')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -135,6 +139,13 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_BEAT_SCHEDULE = {
+    'update_astronomical_data': {
+        'task': 'astronomical_events.tasks.update_daily_astronomical_data',
+        'schedule': timedelta(hours=12),  # Run twice daily
+    },
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/

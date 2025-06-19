@@ -10,7 +10,7 @@ router.register(r'holidays', views.HolidayViewSet)
 router.register(r'images', views.EventImageViewSet)
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
     path('subscribe/', views.NewsletterSubscribeView.as_view()),
     path('visibility/', views.VisibilityDetailList.as_view()),
 ]

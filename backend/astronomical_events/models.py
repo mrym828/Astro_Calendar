@@ -26,28 +26,11 @@ class Location(models.Model):
         help_text="Bortle scale: 1=excellent dark sky, 9=inner city sky"
     )
     
-    last_api_update = models.DateTimeField(null=True, blank=True)
-    api_cache_valid_until = models.DateTimeField(null=True, blank=True)
-    
     class Meta:
         db_table = 'locations'
         indexes = [
             models.Index(fields=['latitude', 'longitude']),
-            models.Index(fields=['last_api_update']),
         ]
-
-class APIDataSource(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    base_url = models.URLField()
-    api_key_required = models.BooleanField(default=False)
-    rate_limit_per_hour = models.IntegerField(default=1000)
-    current_usage = models.IntegerField(default=0)
-    last_reset = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=True)
-    reliability_score = models.FloatField(default=1.0)  
-    
-    class Meta:
-        db_table = 'api_data_sources'
 
 class CelestialEvent(models.Model):
     EVENT_TYPES = [
@@ -68,11 +51,7 @@ class CelestialEvent(models.Model):
     end_time = models.DateTimeField(null=True, blank=True)
     description = models.TextField()
     
-    api_source = models.ForeignKey(APIDataSource, on_delete=models.CASCADE)
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
-    external_id = models.CharField(max_length=200, help_text="ID from external API")
-    raw_api_data = models.JSONField(default=dict, help_text="Original API response")
-    last_updated_from_api = models.DateTimeField(auto_now=True)
     magnitude = models.FloatField(null=True, blank=True)
     coordinates = models.JSONField(default=dict, help_text="Sky coordinates from API")
     is_featured = models.BooleanField(default=False)
@@ -94,11 +73,9 @@ class CelestialEvent(models.Model):
 
     class Meta:
         db_table = 'celestial_events'
-        unique_together = ['external_id', 'api_source', 'date_time']
         indexes = [
             models.Index(fields=['date_time', 'event_type']),
             models.Index(fields=['location', 'date_time']),
-            models.Index(fields=['api_source', 'last_updated_from_api']),
             models.Index(fields=['importance_level', 'date_time']),
             models.Index(fields=['is_featured']),
         ]
@@ -120,13 +97,6 @@ class CelestialEvent(models.Model):
         if self.is_upcoming:
             return self.date_time - timezone.now()
         return None
-    
-    @property
-    def needs_api_refresh(self):
-        """Check if event data needs refreshing from API"""
-        if not self.last_updated_from_api:
-            return True
-        return (timezone.now() - self.last_updated_from_api).days > 1
     
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -211,24 +181,7 @@ class EventImage(models.Model):
     def __str__(self):
         return f"{self.title or 'Image'} for {self.celestial_event.name}"
 
-class APIUsageLog(models.Model):
-    """Track API usage for rate limiting"""
-    api_source = models.ForeignKey(APIDataSource, on_delete=models.CASCADE)
-    endpoint = models.CharField(max_length=200)
-    request_time = models.DateTimeField(auto_now_add=True)
-    response_status = models.IntegerField()
-    response_time_ms = models.IntegerField()
-    success = models.BooleanField()
-    error_message = models.TextField(blank=True)
-    
-    class Meta:
-        db_table = 'api_usage_logs'
-        indexes = [
-            models.Index(fields=['api_source', 'request_time']),
-        ]
-
 class Subscription(models.Model):
-    """User subscriptions for API-driven notifications"""
     email = models.EmailField(unique=True, default="dsjd@outlook.com")
 
     # API-driven preferences
@@ -305,3 +258,13 @@ class Holiday(models.Model):
     
     def __str__(self):
         return f"{self.name} ({self.country_code}) on {self.date}"
+
+class SunData(models.Model):
+    date = models.DateField()
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
+    sunrise = models.TimeField()
+    sunset = models.TimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.date} - Sunrise: {self.sunrise}, Sunset: {self.sunset}"

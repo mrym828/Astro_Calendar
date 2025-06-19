@@ -14,3 +14,4 @@ def is_event_visible(event_time, location):
     alt, az, distance = difference.at(t).altaz()
     
     return alt.degrees > 0  # Above the horizon
+

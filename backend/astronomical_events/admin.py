@@ -9,19 +9,13 @@ class NewsletterSubscriberAdmin(admin.ModelAdmin):
 
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'latitude', 'longitude', 'timezone', 'country_code', 'last_api_update')
+    list_display = ('name', 'latitude', 'longitude', 'timezone', 'country_code')
     search_fields = ('name', 'country_code')
     list_filter = ('country_code',)
 
-@admin.register(APIDataSource)
-class APIDataSourceAdmin(admin.ModelAdmin):
-    list_display = ('name', 'base_url', 'api_key_required', 'rate_limit_per_hour', 'current_usage', 'is_active', 'reliability_score')
-    list_filter = ('api_key_required', 'is_active')
-    search_fields = ('name',)
-
 @admin.register(CelestialEvent)
 class CelestialEventAdmin(admin.ModelAdmin):
-    list_display = ('name', 'event_type', 'date_time', 'location', 'api_source', 'is_featured', 'importance_level')
+    list_display = ('name', 'event_type', 'date_time', 'location','is_featured', 'importance_level')
     list_filter = ('event_type', 'importance_level', 'is_featured')
     search_fields = ('name', 'description')
 
@@ -50,12 +44,6 @@ class EventImageAdmin(admin.ModelAdmin):
     list_display = ('title', 'celestial_event', 'is_primary', 'uploaded_at')
     search_fields = ('title',)
 
-@admin.register(APIUsageLog)
-class APIUsageLogAdmin(admin.ModelAdmin):
-    list_display = ('api_source', 'endpoint', 'request_time', 'response_status', 'success')
-    list_filter = ('api_source', 'success')
-    search_fields = ('endpoint', 'error_message')
-
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('email', 'frequency', 'is_active', 'created_at')
@@ -73,3 +61,7 @@ class HolidayAdmin(admin.ModelAdmin):
     list_display = ('name', 'date', 'country_code', 'is_public')
     list_filter = ('country_code', 'is_public')
     search_fields = ('name', 'country_code')
+
+@admin.register(SunData)
+class SunDataAdmin(admin.ModelAdmin):
+    list_display = ('date', 'location', 'sunrise', 'sunset')
