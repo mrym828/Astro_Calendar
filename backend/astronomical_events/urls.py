@@ -8,6 +8,7 @@ router.register(r'locations', views.LocationViewSet)
 router.register(r'subscriptions', views.SubscriptionViewSet)
 router.register(r'holidays', views.HolidayViewSet)
 router.register(r'images', views.EventImageViewSet)
+router.register(r'sundata', views.SunDataViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

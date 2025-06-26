@@ -1,14 +1,19 @@
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
-
-const Layout = ({ children }) => {
+import Navigation from '../Navigation/Navigation';
+const Layout = ({hero, children}) => {
   return (
-    <>
+    <> 
       <Header />
-      <main className="main-content pt-[60px] min-h-screen w-full">
+      <div className='mt-20'>
+      {hero}
+      <Navigation/>
+      </div>
+      <main className="main-content min-h-screen w-full">
         {children}
       </main>
       <Footer />
+   
     </>
   );
 };

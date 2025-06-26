@@ -12,7 +12,6 @@ class Command(BaseCommand):
             longitude=55.405403
         )[0]
 
-        # Call your function
         fetch_sunrise_sunset(location, "2025-06-18")
 
         self.stdout.write(self.style.SUCCESS('Sun data fetched and saved!'))
