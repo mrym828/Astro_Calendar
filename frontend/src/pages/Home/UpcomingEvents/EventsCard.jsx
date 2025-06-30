@@ -9,7 +9,7 @@ const EventsCard = ({ title, date, description, badge, badgeColor, image }) => {
     <div className='flex justify-between mb-3'>
         <div className='w-[60%]'>
             <div className='mb-2'>
-            <Badges variant={badgeColor} className='w-[50%]'>
+            <Badges variant={badgeColor} className='w-[55%] justify-center' showDot={false}>
                 {badge}
             </Badges>
             </div>

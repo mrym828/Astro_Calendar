@@ -6,6 +6,9 @@ import AstroCalendar from './pages/Calendar/Calendar';
 import HomePageBackGround from './assets/images/Backgrounds/homepage_background.png';
 import CalendarHero from './assets/images/Backgrounds/CalendarHero.png';
 import Hero from './components/common/Hero/Hero';
+import EventsList from './pages/Events/EventsList/EventsList';
+import Archive from './pages/Archive/Archive';
+
 const App = () => {
   return (
     <Routes>
@@ -39,6 +42,38 @@ const App = () => {
             />
           }>
           <AstroCalendar/>
+        </Layout>
+      }   
+      />
+      <Route
+      path="/Events"
+      element={
+        <Layout
+          hero={
+            <Hero
+            Background={CalendarHero}
+            title="Celestial Events"
+            subtitle="Discover upcoming astronomical events and plan your stargazing adventures."
+            showButton= {false}
+            />
+          }>
+          <EventsList/>
+        </Layout>
+      }   
+      />
+      <Route
+      path="/Archive"
+      element={
+        <Layout
+          hero={
+            <Hero
+            Background={CalendarHero}
+            title="Celestial Archive"
+            subtitle="Explore our comprehensive collection of past astronomical events."
+            showButton= {false}
+            />
+          }>
+          <Archive/>
         </Layout>
       }   
       />

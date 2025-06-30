@@ -1,5 +1,5 @@
 const Button = ({ children, onClick, variant = 'primary', className = '' }) => {
-  const base = 'px-6 py-3 rounded-lg font-medium transition-colors text-lg hover:cursor-pointer';
+  const base = 'rounded-lg font-medium transition-colors text-lg hover:cursor-pointer';
 
   const styles = {
     primary: `${base} bg-gradient-to-r to-[#0A66C2] from-[#33055C] text-white`,

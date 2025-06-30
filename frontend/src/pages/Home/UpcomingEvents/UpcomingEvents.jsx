@@ -1,4 +1,4 @@
-import events from '../../../data/events';
+import { events } from '../../../data/events';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import React, { useState } from 'react';
 import EventsCard from './EventsCard';
@@ -29,7 +29,7 @@ const UpcomingEvents = () => {
         <h2 className="text-3xl space-grotesk-font-bold px-4">Upcoming Events</h2>
         <div className="flex gap-3 items-center">
           <div className='text-[#B0AFAF] space-grotesk-font px-2'>
-            <a href='#'>
+            <a href='/calendar'>
           View Calendar
           </a>
         </div>

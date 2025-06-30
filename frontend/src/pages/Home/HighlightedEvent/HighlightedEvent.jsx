@@ -83,10 +83,10 @@ const HighlightedEvent = () =>{
 
             {/* Buttons */}
             <div className="flex gap-4 space-grotesk-font py-1">
-              <Button variant="primary" className='w-55 button-gradient-new button-gradient-hover'>
+              <Button variant="primary" className='px-6 py-3 w-55 button-gradient-new button-gradient-hover'>
                 Set Reminder
               </Button>
-              <Button variant="secondary" className='w-55 hover:bg-white/10'>
+              <Button variant="secondary" className=' px-6 py-3 w-55 hover:bg-white/10'>
                 View more
               </Button>
             </div>

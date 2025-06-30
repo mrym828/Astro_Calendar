@@ -42,4 +42,12 @@ const events = [
   },
 ];
 
-export default events;
+const EventsType =[
+  { title: 'Moon Phase', color: 'blue'},
+  { title: 'Eclipse', color: 'red'},
+  { title: 'Planets', color: 'purple'},
+  { title: 'Meteor Shower', color: 'green'},
+  { title: 'Special Events', color: 'yellow'}
+];
+
+export { events, EventsType };
