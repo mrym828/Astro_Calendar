@@ -5,9 +5,23 @@ import EventsCard from '../Events/EventsList/EventsCard';
 const Archive = () => {
  const [selectedYear, setSelectedYear] = useState(2025);
   const [selectedEventType, setSelectedEventType] = useState('All Events');
+  const [scrollPosition, setScrollPosition] = useState(0);
 
-  const years = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029];
-  
+
+  const currentYear = 2026;
+  const years = Array.from({ length: currentYear - 2000 }, (_, i) => 2000 + i).reverse();
+
+  const slideYears = (direction) => {
+    const container = document.getElementById('year-slider');
+    const scrollAmount = 200;
+    
+    if (direction === 'left') {
+      container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    } else {
+      container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
   const eventTypes = [
     { name: 'All Events', icon: '✨', emoji: '✨' },
     { name: 'Lunar Events', icon: '🌙', emoji: '🌙' },
@@ -45,9 +59,9 @@ const Archive = () => {
           
           <div className="relative  rounded-2xl p-8 backdrop-blur-sm ">
             {/* Timeline Line */}
-            <div className="absolute top-1/3 left-4 right-4 h-1.5 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-500 to-purple-600 transform -translate-y-1/2"></div>
+            <div className="absolute top-3/8 left-4 right-4 h-1.5 rounded-2xl bg-gradient-to-r from-purple-600 via-purple-500 to-purple-600 transform -translate-y-1/2"></div>
             
-            <div className="flex items-center justify-between relative z-10">
+            <div id="year-slider" className="flex items-center justify-between relative z-10 scrollbar-hide px-10 py-10 overflow-x-auto gap-15">
               {years.map((year, index) => (
                 <button
                   key={year}
@@ -64,7 +78,7 @@ const Archive = () => {
                   )}
                   
                   {/* Year dot */}
-                  <div className={`relative w-6 h-6 rounded-full mb-4 mx-auto transition-all duration-300 ${
+                  <div className={`relative w-8 h-8 rounded-full mb-4 mx-auto transition-all duration-300 ${
                     selectedYear === year 
                       ? 'bg-gradient-to-r from-purple-400 to-purple-600 shadow-lg shadow-purple-500/50 ring-4 ring-purple-400/30' 
                       : 'bg-[#2C195A] border-2 border-[#6A33CE] group-hover:bg-purple-400 group-hover:shadow-md group-hover:shadow-purple-400/30'
@@ -123,19 +137,19 @@ const Archive = () => {
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-6">Filter by Event Type</h2>
           
-          <div className="grid grid-cols-7 gap-4">
+          <div className="grid grid-cols-7 gap-3">
             {eventTypes.map((eventType) => (
               <button
                 key={eventType.name}
                 onClick={() => setSelectedEventType(eventType.name)}
-                className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                className={`p-4 py-7 rounded-lg border-2 transition-all duration-200 ${
                   selectedEventType === eventType.name
-                    ? 'border-purple-500 bg-purple-900/30'
-                    : 'border-gray-700 bg-gray-800 hover:border-purple-400 hover:bg-purple-900/20'
+                    ? 'border-[#4E2798] bg-[#211444]/69'
+                    : 'border-white/20 bg-[#232151]/65 hover:border-purple-500 hover:bg-purple-900/20'
                 }`}
               >
-                <div className="text-3xl mb-2">{eventType.emoji}</div>
-                <div className="text-sm font-medium text-center">{eventType.name}</div>
+                <div className="text-6xl mb-10">{eventType.emoji}</div>
+                <div className="text-md font-bold text-center">{eventType.name}</div>
               </button>
             ))}
           </div>

@@ -1,4 +1,5 @@
 import { Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import EventsCard from './EventsCard';
 
 const EventGrid = ({ events }) => {
@@ -17,7 +18,9 @@ const EventGrid = ({ events }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {events.map(event => (
+        <Link to={`/events/${event.id}`} key={event.id}>
         <EventsCard key={event.id} event={event} />
+        </Link>
       ))}
     </div>
   );

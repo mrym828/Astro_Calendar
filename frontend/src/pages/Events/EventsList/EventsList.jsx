@@ -3,15 +3,17 @@ import { useState } from "react";
 import EventGrid from './EventGrid';
 import Paginations from './Paginations';
 import { Filter} from 'lucide-react';
+import { duration } from "@mui/material";
 
 
-const mockEvents = [
+export const mockEvents = [
   {
     id: 1,
     title: "Perseid Meteor Shower Peak",
     type: "meteor shower",
     date: "2025-08-12",
-    time: "22:00",
+    start_time: "11:00 PM",
+    end_time: '12:00 AM',
     location: "Dark Sky Reserve, Utah",
     visibility: "public",
     attendees: 850,
@@ -20,23 +22,28 @@ const mockEvents = [
     description: "Witness the spectacular Perseid meteor shower with up to 60 meteors per hour. Best viewing conditions in decades with new moon phase.",
     featured: true,
     magnitude: "Bright",
-    constellation: "Perseus"
+    constellation: "Perseus",
+    duration:'3hours',
+    color: 'green',
   },
   {
     id: 2,
     title: "Total Lunar Eclipse",
     type: "eclipse",
     date: "2025-09-07",
-    time: "21:30",
+    start_time: "11:00 PM",
+    end_time: '12:00 AM',
     location: "Americas, Europe, Africa",
-    visibility: "public",
+    visibility: "12 Hours",
     attendees: 2500,
     price: 0,
     image: "https://images.unsplash.com/photo-1518066431517-eb3d8cc84e88?w=400&h=250&fit=crop",
     description: "Experience the blood moon as Earth's shadow completely covers the lunar surface. Totality lasts 1 hour and 25 minutes.",
     featured: true,
     magnitude: "Total",
-    constellation: "Pisces"
+    constellation: "Pisces",
+    duration:'3 Hours 24 Minutes',
+    color: 'red',
   },
   {
     id: 3,
@@ -52,7 +59,8 @@ const mockEvents = [
     description: "Jupiter reaches its closest approach to Earth, appearing largest and brightest. Perfect time to observe the Great Red Spot and moons.",
     featured: false,
     magnitude: "-2.9",
-    constellation: "Taurus"
+    constellation: "Taurus",
+    duration:'3hours'
   },
   {
     id: 4,
@@ -68,7 +76,8 @@ const mockEvents = [
     description: "The year's most reliable meteor shower produces multicolored meteors. Up to 120 meteors per hour at peak with excellent viewing conditions.",
     featured: true,
     magnitude: "Bright",
-    constellation: "Gemini"
+    constellation: "Gemini",
+    duration:'3hours'
   },
   {
     id: 5,
@@ -84,7 +93,8 @@ const mockEvents = [
     description: "Venus and Jupiter appear incredibly close in the evening sky, separated by less than 0.5 degrees. A stunning celestial dance.",
     featured: false,
     magnitude: "Very Bright",
-    constellation: "Virgo"
+    constellation: "Virgo",
+    duration:'3hours'
   },
   {
     id: 6,
@@ -100,7 +110,8 @@ const mockEvents = [
     description: "The Moon covers 85% of the Sun's disk at maximum eclipse. Use proper solar filters to safely observe this celestial spectacle.",
     featured: false,
     magnitude: "85% coverage",
-    constellation: "Pisces"
+    constellation: "Pisces",
+    duration:'3hours'
   },
   {
     id: 7,
@@ -116,7 +127,8 @@ const mockEvents = [
     description: "Rare astronomical event where Earth crosses Saturn's ring plane. The rings appear edge-on and virtually disappear from view.",
     featured: false,
     magnitude: "Rare",
-    constellation: "Aquarius"
+    constellation: "Aquarius",
+    duration:'3hours'
   },
   {
     id: 8,
@@ -132,7 +144,8 @@ const mockEvents = [
     description: "This spectacular comet reaches its brightest as it passes closest to Earth. Visible to naked eye with impressive tail stretching across the sky.",
     featured: true,
     magnitude: "3.0",
-    constellation: "Serpens"
+    constellation: "Serpens",
+    duration:'3hours'
   },
   {
     id: 9,
@@ -148,7 +161,8 @@ const mockEvents = [
     description: "Watch the ISS pass directly in front of the Moon in a spectacular transit lasting only 0.8 seconds. Rare photographic opportunity.",
     featured: false,
     magnitude: "-3.5",
-    constellation: "Leo"
+    constellation: "Leo",
+    duration:'3hours',
   },
   {
     id: 10,
@@ -164,7 +178,8 @@ const mockEvents = [
     description: "Watch the ISS pass directly in front of the Moon in a spectacular transit lasting only 0.8 seconds. Rare photographic opportunity.",
     featured: false,
     magnitude: "-3.5",
-    constellation: "Leo"
+    constellation: "Leo",
+    duration:'3hours'
   },
   {
     id: 11,
@@ -180,7 +195,8 @@ const mockEvents = [
     description: "Watch the ISS pass directly in front of the Moon in a spectacular transit lasting only 0.8 seconds. Rare photographic opportunity.",
     featured: false,
     magnitude: "-3.5",
-    constellation: "Leo"
+    constellation: "Leo",
+    duration:'3hours'
   },
   {
     id: 12,
@@ -196,7 +212,8 @@ const mockEvents = [
     description: "Watch the ISS pass directly in front of the Moon in a spectacular transit lasting only 0.8 seconds. Rare photographic opportunity.",
     featured: false,
     magnitude: "-3.5",
-    constellation: "Leo"
+    constellation: "Leo",
+    duration:'3hours'
   },
   {
     id: 13,
@@ -212,7 +229,8 @@ const mockEvents = [
     description: "Watch the ISS pass directly in front of the Moon in a spectacular transit lasting only 0.8 seconds. Rare photographic opportunity.",
     featured: false,
     magnitude: "-3.5",
-    constellation: "Leo"
+    constellation: "Leo",
+    duration:'3hours'
   },
 ];
 
