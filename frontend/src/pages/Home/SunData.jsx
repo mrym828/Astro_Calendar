@@ -5,7 +5,7 @@ const SunDataList = () => {
   const [sunData, setSunData] = useState({});
 
   useEffect(() => {
-    axios.get('http://localhost:8000/sundata')
+    axios.get('http://localhost:8000/sundata/today')
       .then(response => setSunData(response.data))
       .catch(error => console.error('Error fetching sun data:', error));
   }, []);

@@ -5,6 +5,13 @@ from timezone_field import TimeZoneField
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 
+class ApiSource(models.Model):
+    name = models.CharField(max_length=100)
+    base_url = models.URLField()
+    
+    def __str__(self):
+        return self.name
+    
 class NewsletterSubscriber(models.Model):
     email = models.EmailField(unique=True)
     subscribed_at = models.DateTimeField(auto_now_add=True)
@@ -32,6 +39,8 @@ class Location(models.Model):
             models.Index(fields=['latitude', 'longitude']),
         ]
 
+        
+
 class CelestialEvent(models.Model):
     EVENT_TYPES = [
         ('moon_phase', 'Moon Phase'),
@@ -42,6 +51,8 @@ class CelestialEvent(models.Model):
         ('astronomical_twilight', 'Astronomical Twilight'),
         ('conjunction', 'Conjunction'),
         ('opposition', 'Opposition'),
+        ('moon_apogee', 'Moon Apogee'),
+        ('moon_perigee', 'Moon Perigee'), 
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -50,7 +61,10 @@ class CelestialEvent(models.Model):
     date_time = models.DateTimeField(db_index=True)
     end_time = models.DateTimeField(null=True, blank=True)
     description = models.TextField()
-    
+    external_id = models.CharField(max_length=255, unique=True, help_text="External API identifier")
+    raw_api_data = models.JSONField(default=dict, help_text="Raw data from external API")
+    last_updated_from_api = models.DateTimeField(auto_now_add=True, help_text="When this record was last updated from API")
+    api_source = models.ForeignKey(ApiSource, on_delete=models.CASCADE)
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
     magnitude = models.FloatField(null=True, blank=True)
     coordinates = models.JSONField(default=dict, help_text="Sky coordinates from API")
@@ -145,9 +159,14 @@ class Eclipse(CelestialEvent):
     
     eclipse_type = models.CharField(max_length=20, choices=ECLIPSE_TYPES)
     obscuration_percentage = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(100.0)]
+        validators=[MinValueValidator(0.0), MaxValueValidator(100.0)],
+        null=True, blank=True 
     )
-    path_coordinates = models.JSONField(default=list, help_text="Path coordinates from API")
+    partial_begin_altitude = models.FloatField(null=True, blank=True)
+    total_begin_altitude = models.FloatField(null=True, blank=True)
+    peak_altitude = models.FloatField(null=True, blank=True)
+    total_end_altitude = models.FloatField(null=True, blank=True)
+    partial_end_altitude = models.FloatField(null=True, blank=True)
     visibility_regions = models.JSONField(default=list, help_text="Where eclipse is visible")
     duration_seconds = models.IntegerField(null=True, blank=True)
     
@@ -268,3 +287,39 @@ class SunData(models.Model):
 
     def __str__(self):
         return f"{self.date} - Sunrise: {self.sunrise}, Sunset: {self.sunset}"
+    
+class EarthOrbitEvent(models.Model):
+    PHENOMENON_CHOICES = [
+        ('Perihelion', 'Perihelion'),
+        ('Aphelion', 'Aphelion'),
+        ('March Equinox', 'March Equinox'),
+        ('June Solstice', 'June Solstice'),
+        ('September Equinox', 'September Equinox'),
+        ('December Solstice', 'December Solstice'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    phenom = models.CharField(max_length=50, choices=PHENOMENON_CHOICES)
+    date = models.DateField()
+    time = models.TimeField()
+
+    distance_million_km = models.FloatField()
+    orbital_speed_km_s = models.FloatField()
+    solar_irradiance_w_m2 = models.FloatField()
+    eccentricity = models.FloatField()
+    heliocentric_longitude = models.FloatField()
+    true_anomaly = models.FloatField()
+    solar_declination = models.FloatField()
+    day_length_hours = models.FloatField(help_text="Day length at equator")
+
+    season = models.CharField(max_length=20)
+    overview = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'earth_orbit_events'
+        ordering = ['date']
+
+    def __str__(self):
+        return f"{self.phenom} on {self.date}"

@@ -9,7 +9,7 @@ const Layout = ({hero, children}) => {
       {hero}
       <Navigation/>
       </div>
-      <main className="main-content min-h-screen w-full">
+      <main className="main-content min-h-screen w-screen">
         {children}
       </main>
       <Footer />

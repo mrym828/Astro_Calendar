@@ -26,6 +26,9 @@ SECRET_KEY = 'django-insecure-429om3=t$%(84kh2eygc4x3$6h76%iey=1!kt8(^%6bl5&2090
 
 # API keys
 MOON_API_KEY = config('MOON_API_KEY')
+GOOGLE_ELEVATION_API_KEY= config('GOOGLE_ELEVATION_API_KEY')
+ASTRONOMY_API_ID = config('ASTRONOMY_API_ID')
+ASTRONOMY_API_SECRET= config('ASTRONOMY_API_SECRET')
 
 #API URLS
 SUNRISE_SUNSET_URL = config('SunRise_SunSet_URL')
@@ -79,9 +82,23 @@ TEMPLATES = [
     },
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  
+    "http://localhost:5173",  
+    "http://127.0.0.1:8000",
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
 ]
 
 WSGI_APPLICATION = 'astrocalendar_backend.wsgi.application'

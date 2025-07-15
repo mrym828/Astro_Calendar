@@ -15,3 +15,5 @@ class Command(BaseCommand):
         fetch_sunrise_sunset(location, "2025-06-18")
 
         self.stdout.write(self.style.SUCCESS('Sun data fetched and saved!'))
+
+        
